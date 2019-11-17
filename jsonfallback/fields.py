@@ -57,7 +57,7 @@ class FallbackJSONField(jsonb.JSONField):
         else:
             return value.dumps(value.adapted)
 
-    def from_db_value(self, value, expression, connection):
+    def from_db_value(self, value, expression, connection, context={}):
         if '.postgresql' in connection.settings_dict['ENGINE']:
             return value
         elif '.postgresql' in connection.settings_dict['ENGINE']:
