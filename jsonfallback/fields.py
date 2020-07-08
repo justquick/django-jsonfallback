@@ -7,6 +7,7 @@ from django.contrib.postgres.fields import JSONField, jsonb
 from django.core import checks
 from django.db import NotSupportedError
 from django.db.models import Func, TextField, Value, lookups as builtin_lookups, Expression
+from django.utils.datastructures import DictWrapper
 from django_mysql.checks import mysql_connections
 from django_mysql.utils import connection_is_mariadb
 
@@ -30,7 +31,10 @@ class FallbackJSONField(jsonb.JSONField):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.decoder = json.JSONDecoder()
-
+    
+    def db_type_parameters(self, connection):
+        return DictWrapper(self.__dict__, connection.ops.quote_name, 'qn_')
+    
     def db_type(self, connection):
         if '.postgresql' in connection.settings_dict['ENGINE']:
             return super().db_type(connection)
